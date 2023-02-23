@@ -41,28 +41,29 @@ namespace MyStl{
 
         //allocator
         //::operator new返回的是void*类型，需要做一个强制类型转换来确保类型安全。
-        T*
+        static T*
         allocate(){
             return static_cast<T*>(::operator new(sizeof(T)));
         }
-        T*
+        static T*
         allocate(size_type n){
             return static_cast<T*>(::operator new(n * sizeof(T)));
         }
 
         //deallocate
-        void
+        static void
         deallocate(T* ptr){
             ::operator delete(ptr);
         }
         /* gcc */
-        void
+        static void
         deallocate(T* ptr, size_type){
             ::operator delete(ptr);
         }
 
         //construct, 构造
         template<typename Up, typename... Args>
+        static
         void construct(Up* p, Args&&... args) noexcept{
             ::new((void *)p) Up(forward<Args>(args)...);
         }
@@ -77,22 +78,22 @@ namespace MyStl{
          */
         //如果对象是trivial destructor，那么destroy函数可以什么也不做
         template<typename Up>
-        void destroy(Up* p) {
+        static void destroy(Up* p) {
             using is_trivial_dtor = typename type_traits<Up>::has_trivial_destructor;
             destroy_aux(p, is_trivial_dtor());
         }
         template<typename Up>
-        void destroy_aux(Up* p, _false_type){
+        static void destroy_aux(Up* p, _false_type){
             p->~Up();
         }
         template<typename Up>
-        void destroy_aux(Up* p, _true_type){
+        static void destroy_aux(Up* p, _true_type){
         }
 
 
         //max_size,返回最大的可分配数量
         //size_t(~0)获取字节数
-        size_type max_size()const {
+        static size_type max_size() {
             return size_type(~0) / sizeof(value_type);
         }
     };

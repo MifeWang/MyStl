@@ -61,7 +61,7 @@ namespace MyStl{
     malloc_alloc::FunPtr malloc_alloc::malloc_alloc_oom_handler = nullptr;
 
     //set_malloc_handler其实就是给代表handler的静态成员赋值，然后返回原来的handler函数
-    typename malloc_alloc::FunPtr malloc_alloc::set_malloc_handler(malloc_alloc::FunPtr f) {
+    typename malloc_alloc::FunPtr malloc_alloc::set_malloc_handler(FunPtr f) {
         FunPtr old = malloc_alloc_oom_handler;
         malloc_alloc_oom_handler = f;
         return old;
@@ -105,7 +105,7 @@ namespace MyStl{
     //后续默认使用二级分配器，所以二级分配器命名为default_alloc
     //这部分初学还是有点复杂的，主要参考了STL中的__pool_alloc_base和__pool_alloc
     class default_alloc{
-    protected:
+    private:
         enum { align = 8 };   //内存池区块的调整边界
         enum { max_bytes = 128 };   //内存池区块的上限
         enum { free_list_size = (size_t) max_bytes / (size_t) align  }; // free_list节点的个数
@@ -199,40 +199,6 @@ namespace MyStl{
         return result;
     }
 
-    void *default_alloc::refill(size_t n) {
-        //申请的小内存链表的节点数量
-        int n_node = 20;
-        //
-        char *chunk = chunk_alloc(n, n_node);
-        //如果只传回了一个节点大小的空间，那么直接返回；这里n_node对应的形参是引用
-        if (n_node == 1){
-            return static_cast<void*>(chunk);
-        }
-        //如果有多余的，那么需要把剩下的节点添加到列表中
-        obj* volatile* my_free_list;
-        obj*           current_obj;
-        obj*           next_obj;
-
-        //先找到对应内存大小在内存池链表中的链表头
-        my_free_list = get_free_list(n);
-
-        //返回第一块内存
-        void* result = static_cast<void*>(chunk);
-        //空闲链表指向第二块内存
-        *my_free_list = next_obj = (obj*)(chunk + n);
-        //循环构建内存链表，每个节点指向一块n大小的内存块，最后一个节点指向null
-        for (int i = 1; ;++i) {
-            current_obj = next_obj;
-            next_obj = (obj*)((char *)chunk + n);
-            if (n_node - 1 == i){
-                current_obj->next_free_list_link = nullptr;
-                break;
-            } else
-            current_obj->next_free_list_link = next_obj;
-        }
-        return result;
-    }
-
     char *default_alloc::chunk_alloc(size_t size, int &n_nodes) {
         //total_bytes是总申请的内存大小，bytes_left是剩余的内存空间
         char* result;
@@ -244,17 +210,15 @@ namespace MyStl{
             result = start_free;
             start_free += total_bytes;
             return result;
-        }
-        //情况2，剩余内存不够total_bytes，但是还有结余能分一块，此时能返回多少返回多少，先用着
-        else if (bytes_left >= size){
+        } else if (bytes_left >= size){
+            //情况2，剩余内存不够total_bytes，但是还有结余能分一块，此时能返回多少返回多少，先用着
             n_nodes = (int) (bytes_left / size);
             total_bytes = size * n_nodes;
             result = start_free;
             start_free += total_bytes;
             return result;
-        }
-        //情况3，一块也不够分配
-        else{
+        } else{
+            //情况3，一块也不够分配
             //将剩下的内存全部归入其它列表，因为申请的都是8的倍数的内存，所以必定可以全部归入
             if (bytes_left > 0){
                 obj* volatile* my_free_list = get_free_list(bytes_left);
@@ -297,6 +261,41 @@ namespace MyStl{
         }
     }
 
+    void *default_alloc::refill(size_t n) {
+        //申请的小内存链表的节点数量
+        int n_node = 20;
+        char *chunk = chunk_alloc(n, n_node);
+        //如果只传回了一个节点大小的空间，那么直接返回；这里n_node对应的形参是引用
+        if (n_node == 1){
+            return static_cast<void*>(chunk);
+        }
+        //如果有多余的，那么需要把剩下的节点添加到列表中
+        obj* volatile* my_free_list;
+        obj*           current_obj;
+        obj*           next_obj;
+
+        //先找到对应内存大小在内存池链表中的链表头
+        my_free_list = get_free_list(n);
+
+        //返回第一块内存
+        void* result = static_cast<void*>(chunk);
+        //空闲链表指向第二块内存
+        *my_free_list = next_obj = (obj*)(chunk + n);
+        //循环构建内存链表，每个节点指向一块n大小的内存块，最后一个节点指向null
+        for (int i = 1; ;++i) {
+            current_obj = next_obj;
+            next_obj = (obj*)((char *)next_obj + n);
+            if (n_node - 1 == i){
+                current_obj->next_free_list_link = nullptr;
+                break;
+            } else
+            current_obj->next_free_list_link = next_obj;
+        }
+        return result;
+    }
+
+
+
     template<typename T>
     class pool_alloc{
     public:
@@ -331,22 +330,17 @@ namespace MyStl{
         }
 
         // 负责构造对象
-//        template<typename Up, typename... Args>
-//        inline void construct(Up* p, Args&&... args) noexcept {
-//            new((void *)p) Up(forward<Args>(args)...);
-//        }
-
-        inline void construct(T* ptr) {
-            new (ptr) T();
+        template<typename Up, typename... Args>
+        inline void construct(Up* p, Args&&... args) noexcept {
+            new((void *)p) Up(forward<Args>(args)...);
         }
 
         // 负责析构对象
-//        template<typename UP>
-        static inline void destroy(T* ptr) {
+        template<typename UP>
+        static inline void destroy(UP* ptr) {
             ptr->~UP();
         }
 
-//        static void destroy(T* first, T* last);
         // 获取某对象的地址
         static pointer
         address(reference x) {
