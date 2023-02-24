@@ -1,6 +1,4 @@
-//
-// Created by 19042 on 2022/11/17.
-//
+
 #pragma once
 #ifndef MYSTL_TYPE_TRAITS_H
 #define MYSTL_TYPE_TRAITS_H

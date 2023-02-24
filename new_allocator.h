@@ -1,7 +1,4 @@
-//
-// Created by 19042 on 2023/2/22.
-//
-//#pragma once
+
 #ifndef MYSTL_NEW_ALLOCATOR_H
 #define MYSTL_NEW_ALLOCATOR_H
 

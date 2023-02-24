@@ -1,6 +1,4 @@
-//
-// Created by 19042 on 2023/2/23.
-//
+
 #pragma once
 #ifndef MYSTL_TEST_ALLOCATOR_H
 #define MYSTL_TEST_ALLOCATOR_H
