@@ -18,8 +18,8 @@ namespace MyStl{
         ::new((void*) p) T1(value);
     }
 
-    template<typename Up>
-    inline void destroy(Up* ptr) {
+    template<typename T>
+    inline void destroy(T* ptr) {
         ptr->~T();
     }
 

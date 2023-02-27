@@ -20,7 +20,7 @@ namespace MyStl{
 
     //如果是POD类型，或者叫TrivialValueTypes，那么直接调用copy函数，也就是软拷贝
     template <typename InputIterator, typename ForwardIterator>
-    inline ForwardIterator uninitialized_copy_aux(InputIterator first,
+    inline ForwardIterator _uninitialized_copy(InputIterator first,
                                                   InputIterator last,
                                                   ForwardIterator result,
                                                   _true_type) {
@@ -29,7 +29,7 @@ namespace MyStl{
 
     //如果不是POD类型，则需要调用对应的构造函数
     template <typename InputIterator, typename ForwardIterator>
-    inline ForwardIterator uninitialized_copy_aux(InputIterator first,
+    inline ForwardIterator _uninitialized_copy(InputIterator first,
                                                   InputIterator last,
                                                   ForwardIterator result,
                                                   _false_type){
