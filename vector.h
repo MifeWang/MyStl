@@ -106,7 +106,7 @@ namespace MyStl{
         iterator insert(iterator pos, const value_type& value = T()){
             auto offset = pos - cbegin();
             if (finish != end_of_storage && pos == finish)
-                construct(finish, value);
+                construct(finish++, value);
             else
                 insert_aux(pos, value);
             return start + offset;
