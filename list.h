@@ -246,14 +246,7 @@ namespace MyStl{
 
     template<typename T, typename Allocator>
     list<T, Allocator> &list<T, Allocator>::operator=(std::initializer_list<T> rhs) {
-
-    }
-
-
-    //等于操作符，多退少补策略，使用等于号进行赋值。补的时候使用insert深拷贝，退的时候使用erase析构数据并释放内存
-    template<typename T, typename Allocator>
-    list<T, Allocator> &list<T, Allocator>::operator=(const list<T, Allocator> &rhs) {
-        if (*this != rhs){
+        if (&rhs != this) {
             iterator first1 = begin();
             iterator last1 = end();
             const_iterator first2 = rhs.cbegin();
@@ -265,6 +258,26 @@ namespace MyStl{
             else
                 erase(first1, last1);
         }
+        return *this;
+    }
+
+
+    //等于操作符，多退少补策略，使用等于号进行赋值。补的时候使用insert深拷贝，退的时候使用erase析构数据并释放内存
+    template<typename T, typename Allocator>
+    list<T, Allocator>& list<T, Allocator>::operator=(const list<T, Allocator> &rhs) {
+        if (&rhs != this){
+            iterator first1 = begin();
+            iterator last1 = end();
+            const_iterator first2 = rhs.cbegin();
+            const_iterator last2 = rhs.cend();
+            for (; first1 != last1 && first2 != last2; ++first1, ++first1)
+                *first1 = *first2;
+            if (first1 == last1)
+                insert(last1, first2, last2);
+            else
+                erase(first1, last1);
+        }
+        return *this;
     }
 
     template<typename T, typename Allocator>
@@ -299,15 +312,16 @@ namespace MyStl{
         //使用一个数组来保存排序后的链表，数组大小64，也就是最多可以排序2^63长度的链表
         list tmp[64];
         //fill表示已排序链表的下一个储存位置，所以fill所指的链表应该始终为空
-        list * fill = tmp;
-        list * counter;
+        list* fill = tmp;
+        list* counter;
         while (!empty()){
             //使用splice从待排序链表表头取一个节点到carry
-            carry = splice(carry.begin(),*this, begin());
+            carry.splice(carry.begin(),*this, begin());
             counter = tmp;
             while (counter != fill && !counter->empty()){
                 counter->merge(carry);
-                carry.swap(*counter++);
+                carry.swap(*counter);
+                ++counter;
             }
             carry.swap(*counter);
             //counter == fill则表明tmp中的所有节点都已经排序完毕，并转移到了fill的位置
