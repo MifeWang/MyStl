@@ -361,7 +361,7 @@ namespace MyStl{
             std::copy_backward(start, pos, next);
             pop_front();
         } else {
-            copy(next, finish, pos);
+            std::copy(next, finish, pos);
             pop_back();
         }
         return start + index;
@@ -370,7 +370,7 @@ namespace MyStl{
     template<typename T>
     template<typename InputIterator>
     void deque<T>::insert(deque::iterator pos, InputIterator first, InputIterator last) {
-        copy(first, last, std::inserter(*this, pos));
+        std::copy(first, last, std::inserter(*this, pos));
     }
 
     template<typename T>

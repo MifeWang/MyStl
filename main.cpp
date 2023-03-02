@@ -1,19 +1,14 @@
 #pragma once
 #include <iostream>
-#include "vector"
-#include "typeinfo"
-
-using namespace std;
-
-
-#include "test/test_allocator.h"
+#include "iostream"
+#include "test_allocator.h"
 #include "test_vector.h"
-#include "uninitialized.h"
-#include "list"
 #include "test_list.h"
 #include "test_deque.h"
+#include "test_stack.h"
+#include "test_queue.h"
 using namespace std;
 int main(){
-    MyStl::deque_test();
+    MyStl::test_queue();
 
 }

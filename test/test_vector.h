@@ -20,7 +20,7 @@ inline bool vec_equal(const std::vector<T, Alloc1> lhs,
 
 namespace MyStl{
 
-    void vector_test() {
+    void test_vector() {
         std::cout << "[============================================================"
                      "===]\n";
         std::cout << "[----------------- Run container test : vector "

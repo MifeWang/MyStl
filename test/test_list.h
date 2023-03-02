@@ -5,7 +5,7 @@
 #include "test_Macros.h"
 #include "../list.h"
 namespace MyStl{
-    void list_test() {
+    void test_list() {
         std::cout << "[============================================================"
                      "===]\n";
         std::cout << "[----------------- Run container test : list "

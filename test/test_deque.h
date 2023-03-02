@@ -5,7 +5,7 @@
 #include "test_Macros.h"
 #include "../deque.h"
 namespace MyStl{
-    void deque_test() {
+    void test_deque() {
         std::cout << "[============================================================"
                      "===]\n";
         std::cout << "[----------------- Run container test : deque "
