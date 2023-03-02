@@ -1,6 +1,7 @@
 
 #ifndef MYSTL_LIST_H
 #define MYSTL_LIST_H
+#include "iostream"
 #include "iterator.h"
 #include "pool_allocator.h"
 #include "construct.h"

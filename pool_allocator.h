@@ -3,6 +3,7 @@
 #define MYSTL_POOL_ALLOCATOR_H
 
 #include "move.h"
+
 namespace MyStl{
     //按照现在stl说法，当size > _S_max_bytes时，也应该直接使用new进行创建，也就是new_allocator
     //但是我们还是从练习角度出发，设计SIG中的二级分配器。
