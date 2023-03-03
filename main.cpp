@@ -7,8 +7,9 @@
 #include "test_deque.h"
 #include "test_stack.h"
 #include "test_queue.h"
+#include "test_priority_queue.h"
 using namespace std;
 int main(){
-    MyStl::test_queue();
+    MyStl::test_priority_queue();
 
 }

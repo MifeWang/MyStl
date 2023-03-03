@@ -70,7 +70,7 @@ namespace MyStl{
             return !(node == rhs.node);
         }
         //解引用操作符
-        reference operator*(){
+        reference operator*() const{
             return (*node).data;
         }
         pointer operator->() const {

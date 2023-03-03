@@ -67,8 +67,8 @@ namespace MyStl{
 
         deque_iterator& operator=(const deque_iterator&) = default;
 
-        reference operator*() { return *cur;}
-        pointer operator->() { return &(operator*());}
+        reference operator*() const { return *cur;}
+        pointer operator->() const { return &(operator*());}
 
         self& operator++() noexcept{
             ++cur;
